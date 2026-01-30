@@ -1,67 +1,60 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.facebook.react'
-apply plugin: 'org.jetbrains.kotlin.android' // Ensure this plugin is applied if using Kotlin
 
+/**
+ * This is the main build script for your app's Android variant.
+ * It's where you configure the Android build system for your app.
+ */
 android {
-    ndkVersion reactNativeAndNdkVersion
+    // The `namespace` property is required for Android Gradle Plugin (AGP) 7.0 and higher.
+    // It specifies the Java/Kotlin package name for your app's source code, R class, and BuildConfig.
+    // The React Native CLI failed to find this, causing the build error.
+    // IMPORTANT: Replace "com.yourcompany.yourapp" with your actual desired unique package name.
+    // This should ideally match your `applicationId` and the `package` attribute in AndroidManifest.xml.
+    namespace "com.yourcompany.yourapp"
+
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.yourprojectname" // REPLACE WITH YOUR ACTUAL APPLICATION ID
+        applicationId "com.yourcompany.yourapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1 // REPLACE WITH YOUR ACTUAL VERSION CODE
-        versionName "1.0" // REPLACE WITH YOUR ACTUAL VERSION NAME
-        missingDimensionStrategy 'ReactNativeFlipper', ['debug', 'release']
-    }
+        versionCode 1
+        versionName "1.0"
 
-    signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
+        // You can add other defaultConfig properties here as needed.
+        // testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
         release {
-            // Add your own signing config for release builds here
-            // signingConfig signingConfigs.release
+            // In a production app, you would configure your release signing config here.
+            // For debugging or CI/CD, 'debug' signing is often used.
+            signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
 
-    // Force specific Kotlin standard library version to prevent conflicts
-    configurations.all {
-        resolutionStrategy {
-            force "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
-            force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlinVersion}" // Include if your project uses JDK8 standard library
-        }
+    // Packaging options to control how your APK is packaged.
+    packagingOptions {
+        // Exclude specific files to avoid conflicts, if necessary.
+        // pickFirst "**/libc++_shared.so"
     }
+
+    // Other configurations like lint, testOptions, etc., might be here.
+    // Ensure you merge this `namespace` addition with your existing `android { ... }` block.
 }
 
+// Dependencies for your app. Keep existing dependencies and add new ones as needed.
 dependencies {
+    // This line typically adds all .jar files in the libs directory.
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    // React Native dependencies
-    implementation "com.facebook.react:react-native:+"  // From node_modules
+    
+    // Ensure react-android is correctly implemented.
+    implementation "com.facebook.react:react-android"
 
-    // Explicitly add kotlin-stdlib if not implicitly added or to ensure version
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlinVersion}"
-
-    // Add other project dependencies below this line
-    // implementation 'androidx.appcompat:appcompat:1.6.1'
-    // implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    // testImplementation 'junit:junit:4.+'
-    // androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    // androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    // Add any other dependencies for your project here (e.g., native modules, Google Play services, etc.).
+    // Example:
+    // implementation "com.facebook.fresco:fresco:2.5.0"
 }
-
-// Apply Flipper if enabled
-apply from: file("../../node_modules/react-native/react.gradle")
-apply from: file("../../node_modules/react-native-flipper/react-native-flipper.gradle") // Only if Flipper is used
