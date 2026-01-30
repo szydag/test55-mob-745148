@@ -1,35 +1,47 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
 buildscript {
     ext {
-        minSdkVersion = 21
-        // Update compileSdkVersion and targetSdkVersion to a recent stable API level, e.g., 33 or 34
-        compileSdkVersion = 33 
-        targetSdkVersion = 33
-        // Ensure Kotlin version is compatible with the new AGP version (e.g., 1.9.0 for AGP 8.2.x)
-        kotlinVersion = "1.9.0"
+        // IMPORTANT: These versions are critical for compatibility.
+        // For Gradle 8.3 (detected in logs), Android Gradle Plugin (AGP) 8.2.x and Kotlin 1.9.x are generally recommended.
+        // Adjust 'minSdkVersion' based on your app's minimum supported Android version.
+        buildToolsVersion = "34.0.0" // Recommend latest stable build tools
+        minSdkVersion = 24 // Common default for modern RN apps (Android 7.0)
+        compileSdkVersion = 34 // Latest stable Android SDK version
+        targetSdkVersion = 34 // Should match compileSdkVersion for new apps
+        kotlinVersion = "1.9.0" // Align with AGP and React Native recommendations
     }
     repositories {
         google()
         mavenCentral()
+        // Make sure you have all necessary repositories here
     }
     dependencies {
-        // The core fix: Update Android Gradle Plugin (AGP) version.
-        // Gradle 8.3 is compatible with AGP versions 8.1.x or 8.2.x. Let's use 8.2.2.
-        classpath 'com.android.tools.build:gradle:8.2.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+        // Ensure this AGP version is compatible with the Gradle wrapper version (e.g., Gradle 8.3)
+        // Check https://developer.android.com/studio/releases/gradle-plugin for the compatibility matrix.
+        classpath("com.android.tools.build:gradle:8.2.0")
+        // Kotlin Gradle plugin, aligned with the defined kotlinVersion
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+        // Merge with any other existing buildscript dependencies in your project
     }
 }
 
+// Ensure your allprojects block includes necessary repositories like google() and mavenCentral()
+// and React Native specific repositories.
 allprojects {
     repositories {
+        maven { url "$rootDir/../node_modules/react-native/android" }
+        maven { url "$rootDir/../node_modules/jsc-android/dist" }
         mavenCentral()
         google()
-        maven { url 'https://www.jitpack.io' } // Common for many React Native libraries
-        // Add any other necessary project-wide repositories here
+        maven { url 'https://www.jitpack.io' } // Commonly needed for various RN libraries
+        // Merge with any other existing allprojects repositories in your project
     }
 }
 
-task clean(type: Delete) {
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

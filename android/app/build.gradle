@@ -1,44 +1,67 @@
-apply plugin: "com.android.application"
-apply plugin: "com.facebook.react"
+apply plugin: 'com.android.application'
+apply plugin: 'com.facebook.react'
+apply plugin: 'org.jetbrains.kotlin.android' // Ensure this plugin is applied if using Kotlin
 
 android {
-    namespace "com.appforge.test55"
-    compileSdk 33
+    ndkVersion reactNativeAndNdkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.appforge.test55"
-        minSdk 21
-        targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        applicationId "com.yourprojectname" // REPLACE WITH YOUR ACTUAL APPLICATION ID
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1 // REPLACE WITH YOUR ACTUAL VERSION CODE
+        versionName "1.0" // REPLACE WITH YOUR ACTUAL VERSION NAME
+        missingDimensionStrategy 'ReactNativeFlipper', ['debug', 'release']
     }
 
     signingConfigs {
-        release {
-            storeFile file('release.keystore')
+        debug {
+            storeFile file('debug.keystore')
             storePassword 'android'
-            keyAlias 'key0'
+            keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
     }
 
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
         release {
-            signingConfig signingConfigs.release
-            minifyEnabled false
+            // Add your own signing config for release builds here
+            // signingConfig signingConfigs.release
+            minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+
+    // Force specific Kotlin standard library version to prevent conflicts
+    configurations.all {
+        resolutionStrategy {
+            force "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+            force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlinVersion}" // Include if your project uses JDK8 standard library
         }
     }
 }
 
 dependencies {
-    implementation("com.facebook.react:react-android")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
-    
-    if (hermesEnabled.toBoolean()) {
-        implementation("com.facebook.react:hermes-android")
-    } else {
-        implementation jscFlavor
-    }
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    // React Native dependencies
+    implementation "com.facebook.react:react-native:+"  // From node_modules
+
+    // Explicitly add kotlin-stdlib if not implicitly added or to ensure version
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlinVersion}"
+
+    // Add other project dependencies below this line
+    // implementation 'androidx.appcompat:appcompat:1.6.1'
+    // implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    // testImplementation 'junit:junit:4.+'
+    // androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    // androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
+
+// Apply Flipper if enabled
+apply from: file("../../node_modules/react-native/react.gradle")
+apply from: file("../../node_modules/react-native-flipper/react-native-flipper.gradle") // Only if Flipper is used
