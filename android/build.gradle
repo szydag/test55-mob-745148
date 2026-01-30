@@ -1,11 +1,38 @@
-    ext { 
-        kotlin_version = '1.9.23'
+buildscript {
+    ext {
+        buildToolsVersion = "34.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        kotlinVersion = "1.8.20" // Compatible with AGP 8.3.2
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.3.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // The Android Gradle Plugin dependency MUST be declared here, within the buildscript's dependencies block.
+        classpath("com.android.tools.build:gradle:8.3.2")
+        // The Kotlin Gradle plugin dependency should also be here if using Kotlin.
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${project.ext.kotlinVersion}")
     }
+}
+
+allprojects {
+    repositories {
+        mavenLocal()
+        maven {
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            url("$rootDir/../node_modules/jsc-android/dist")
+        }
+        google()
+        mavenCentral()
+        maven { url 'https://www.jitpack.io' }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
